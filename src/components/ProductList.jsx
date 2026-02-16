@@ -4,9 +4,6 @@ import { selectSearchTerm } from '../store/searchSlice'
 import useProducts from '../hooks/useProducts'
 import ProductItem from './ProductItem'
 
-/**
- * ProductList component - Displays a list of products with search filtering
- */
 function ProductList(){
   const { products, loading, error } = useProducts()
   const searchTerm = useSelector(selectSearchTerm)
