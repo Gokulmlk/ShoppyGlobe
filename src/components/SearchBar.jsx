@@ -1,16 +1,20 @@
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSearchTerm, clearSearchTerm, selectSearchTerm } from '../store/searchSlice'
 
 /**
  * SearchBar component - Allows users to search/filter products
  */
-function SearchBar(){
-  
+function SearchBar() {
+  const dispatch = useDispatch()
+  const searchTerm = useSelector(selectSearchTerm)
 
   function handleSearchChange(e){
-    
+    dispatch(setSearchTerm(e.target.value))
   }
 
-  function handleClearSearch() {
-   
+  const handleClearSearch = () => {
+    dispatch(clearSearchTerm())
   }
 
   return (

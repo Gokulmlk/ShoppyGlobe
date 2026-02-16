@@ -1,11 +1,16 @@
-
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { selectSearchTerm } from '../store/searchSlice'
+import useProducts from '../hooks/useProducts'
 import ProductItem from './ProductItem'
 
 /**
  * ProductList component - Displays a list of products with search filtering
  */
 function ProductList(){
- 
+  const { products, loading, error } = useProducts()
+  const searchTerm = useSelector(selectSearchTerm)
+
   // Filter products based on search term
   const filteredProducts = products.filter((product) =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -53,7 +58,9 @@ function ProductList(){
         {searchTerm ? `Search Results (${filteredProducts.length})` : 'All Products'}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        
+        {filteredProducts.map((product) => (
+          <ProductItem key={product.id} product={product} />
+        ))}
       </div>
     </div>
   )
