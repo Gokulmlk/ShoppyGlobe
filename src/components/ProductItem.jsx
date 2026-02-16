@@ -3,10 +3,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../store/cartSlice'
 
-/**
- * ProductItem component - Represents a single product with Add to Cart functionality
- */
-const ProductItem = ({ product }) => {
+function ProductItem({ product }){
   const dispatch = useDispatch()
   const [imageLoaded, setImageLoaded] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)

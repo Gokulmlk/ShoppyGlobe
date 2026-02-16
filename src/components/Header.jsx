@@ -7,34 +7,44 @@ import { selectTotalQuantity } from '../store/cartSlice'
   const totalQuantity = useSelector(selectTotalQuantity)
 
   return (
-    <header className="bg-gray-800 shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <Link to="/" className="text-white no-underline">
-          <h1 className="text-2xl font-bold">🛒 ShoppyGlobe</h1>
-        </Link>
+    <header className="bg-red-600/30 backdrop-blur-xl shadow-lg border-b border-white/20 sticky top-0 z-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    
+    {/* Logo */}
+    <Link to="/" className="no-underline">
+      <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-300 via-red-300 to-black bg-clip-text text-transparent tracking-wide">
+        🛒 ShoppyGlobe
+      </h1>
+    </Link>
 
-        <nav className="flex gap-8 items-center">
-          <Link
-            to="/"
-            className="text-gray-300 hover:text-white text-base font-medium transition-colors"
-          >
-            Home
-          </Link>
-          <Link
-            to="/cart"
-            className="text-gray-300 hover:text-white text-base font-medium transition-colors flex items-center gap-2 relative"
-          >
-            <span className="text-xl">🛒</span>
-            Cart
-            {totalQuantity > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                {totalQuantity}
-              </span>
-            )}
-          </Link>
-        </nav>
-      </div>
-    </header>
+    {/* Navigation */}
+    <nav className="flex gap-4 items-center">
+      
+      {/* Home Button */}
+      <Link
+        to="/"
+        className="px-4 py-2 rounded-xl text-white font-medium bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 transition-all duration-300 hover:scale-105"
+      >
+        Home
+      </Link>
+
+      {/* Cart Button */}
+      <Link
+        to="/cart"
+        className="relative px-4 py-2 rounded-xl text-white font-medium flex items-center gap-2 bg-gradient-to-r from-pink-500/80 to-red-500/80 hover:from-pink-500 hover:to-red-600 shadow-md transition-all duration-300 hover:scale-105"
+      >
+        <span className="text-lg">🛒</span>
+        Cart
+
+        {totalQuantity > 0 && (
+          <span className="absolute -top-2 -right-2 bg-yellow-400 text-black rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center text-xs font-bold shadow">
+            {totalQuantity}
+          </span>
+        )}
+      </Link>
+    </nav>
+  </div>
+</header>
   )
 }
 
