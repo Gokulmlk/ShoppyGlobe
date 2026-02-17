@@ -17,7 +17,7 @@ function ProductDetail(){
   const [addedToCart, setAddedToCart] = useState(false)
 
   useEffect(() => {
-    async function fetchProductDetailasync (){
+    const fetchProductDetail = async () =>{
       try {
         setLoading(true)
         setError(null)
