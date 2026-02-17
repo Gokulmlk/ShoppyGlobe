@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { selectCartItems, selectTotalAmount, clearCart } from '../store/cartSlice'
 import Header from '../components/Header'
 
-const Checkout = () => {
+function Checkout(){
   const cartItems = useSelector(selectCartItems)
   const totalAmount = useSelector(selectTotalAmount)
   const dispatch = useDispatch()
