@@ -11,7 +11,7 @@ function CartItem ({ item }){
       <img
         src={item.thumbnail}
         alt={item.title}
-        className="w-full md:w-24 h-48 md:h-24 object-cover rounded-lg flex-shrink-0"
+        className="w-full md:w-24 h-48 md:h-24 object-cover rounded-lg shrink-0"
         loading="lazy"
       />
 
@@ -21,7 +21,7 @@ function CartItem ({ item }){
       </div>
 
       <div className="flex flex-row md:flex-col gap-3 items-end md:items-end justify-between md:justify-center">
-        <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center gap-2 bg-gray-200 rounded-lg p-1">
           <button
             onClick={() => dispatch(decreaseQuantity(item.id))}
             disabled={item.quantity === 1}
@@ -30,7 +30,7 @@ function CartItem ({ item }){
           >
             −
           </button>
-          <span className="min-w-[30px] text-center font-semibold text-base">{item.quantity}</span>
+          <span className="min-w-[35px] text-center font-semibold text-base">{item.quantity}</span>
           <button
             onClick={() => dispatch(increaseQuantity(item.id))}
             className="w-8 h-8 flex items-center justify-center bg-white rounded-md text-lg font-bold hover:bg-blue-600 hover:text-white transition-colors"
@@ -46,7 +46,7 @@ function CartItem ({ item }){
 
         <button
           onClick={() => dispatch(removeFromCart(item.id))}
-          className="px-4 py-2 bg-red-50 text-red-600 rounded-md text-sm font-medium hover:bg-red-100 transition-colors"
+          className="px-4 py-2 bg-red-50 text-red-500 rounded-md text-sm font-medium hover:bg-red-100 transition-colors"
           title="Remove from cart"
         >
           🗑️ Remove
