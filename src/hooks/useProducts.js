@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
 
-/**
- * Custom hook to fetch products from the API
- * @returns {Object} - Contains products, loading state, and error
- */
+
 function useProducts(){
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
