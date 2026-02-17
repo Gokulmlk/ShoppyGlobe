@@ -13,7 +13,7 @@ import { selectTotalQuantity } from '../store/cartSlice'
     
     {/* Logo */}
     <Link to="/" className="no-underline">
-      <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-300 via-red-300 to-black bg-clip-text text-transparent tracking-wide">
+      <h1 className="text-2xl font-extrabold bg-black bg-clip-text text-transparent tracking-wide">
         🛒 ShoppyGlobe
       </h1>
     </Link>
