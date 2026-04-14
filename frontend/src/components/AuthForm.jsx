@@ -1,87 +1,108 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
-const AuthForm = () => {
-  const [isRegister, setIsRegister] = useState(false); // toggle between register & login
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [message, setMessage] = useState('');
+const AuthCard = () => {
+  const [isLogin, setIsLogin] = useState(true);
 
-  const handleChange = e => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    try {
-      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
-      const payload = isRegister
-        ? formData
-        : { email: formData.email, password: formData.password };
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+  };
 
-      const res = await axios.post(endpoint, payload);
-      setMessage(`${isRegister ? 'Registration' : 'Login'} successful!`);
-      localStorage.setItem('token', res.data.token); // store JWT
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const url = isLogin
+        ? "http://localhost:5000/api/auth/login"
+        : "http://localhost:5000/api/auth/register";
+
+      const payload = isLogin
+        ? { email: formData.email, password: formData.password }
+        : formData;
+
+      const res = await axios.post(url, payload);
+
+      // Save token
+      localStorage.setItem("token", res.data.token);
+
+      alert(res.data.message || "Success");
+
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Something went wrong');
+      alert(err.response?.data?.message || "Error occurred");
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        {isRegister ? 'Create Account' : 'Sign In'}
-      </h2>
+    <div className=" flex items-center justify-center bg-gray-100">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-[350px]">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          {isLogin ? "Sign In" : "Register"}
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {isRegister && (
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          {!isLogin && (
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              className="w-full p-2 border rounded-lg"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          )}
+
           <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={formData.name}
+            type="email"
+            name="email"
+            placeholder="Email"
+            className="w-full p-2 border rounded-lg"
+            value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
-        )}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-        >
-          {isRegister ? 'Register' : 'Login'}
-        </button>
-      </form>
 
-      {message && (
-        <p className="mt-4 text-center text-sm text-gray-600">{message}</p>
-      )}
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            className="w-full p-2 border rounded-lg"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
 
-      <button
-        onClick={() => setIsRegister(!isRegister)}
-        className="mt-6 w-full text-blue-600 hover:underline text-sm"
-      >
-        {isRegister ? 'Already have an account? Sign In' : 'New user? Register'}
-      </button>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+          >
+            {isLogin ? "Login" : "Register"}
+          </button>
+        </form>
+
+        <p className="text-center mt-4 text-sm">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          <button
+            onClick={toggleMode}
+            className="text-blue-500 ml-2 font-semibold"
+          >
+            {isLogin ? "Register" : "Login"}
+          </button>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default AuthForm;
+export default AuthCard;

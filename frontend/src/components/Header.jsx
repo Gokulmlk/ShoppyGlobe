@@ -1,64 +1,121 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { selectTotalQuantity } from '../store/cartSlice'
-import AuthForm from './AuthForm.jsx';
-import { useState } from 'react';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectTotalQuantity } from "../store/cartSlice";
+import AuthForm from "./AuthForm.jsx";
 
+export default function Header() {
+  const totalQuantity = useSelector(selectTotalQuantity);
 
- export default function Header (){
-  const totalQuantity = useSelector(selectTotalQuantity)
-  
+  const [isOpen, setIsOpen] = useState(false); // mobile menu
+  const [showAuth, setShowAuth] = useState(false); // auth modal
 
   return (
-    <header className="bg-gray-600/30 backdrop-blur-xl shadow-lg border-b border-white/20 sticky top-0 z-50">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-    
-    {/* Logo */}
-    <Link to="/" className="no-underline">
-      <h1 className="text-2xl font-extrabold bg-black bg-clip-text text-transparent tracking-wide">
-        🛒 ShoppyGlobe
-      </h1>
-    </Link>
+    <>
+      <header className="bg-gray-600/30 backdrop-blur-xl shadow-lg border-b border-white/20 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
 
-    {/* Navigation */}
-    <nav className="flex gap-4 items-center">
-      
-      {/* Home Button */}
-      <Link
-        to="/"
-        className="px-4 py-2 rounded-xl text-white font-medium bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 transition-all duration-300 hover:scale-105"
-      >
-        Home
-      </Link>
+          {/* Logo */}
+          <Link to="/" className="no-underline">
+            <h1 className="text-2xl font-extrabold bg-black bg-clip-text text-transparent tracking-wide">
+              🛒 ShoppyGlobe
+            </h1>
+          </Link>
 
-      {/* Cart Button */}
-      <Link
-        to="/cart"
-        className="relative px-4 py-2 rounded-xl text-white font-medium flex items-center gap-2 bg-gradient-to-r from-pink-500/80 to-red-500/80 hover:from-pink-500 hover:to-red-600 shadow-md transition-all duration-300 hover:scale-105"
-      >
-        <span className="text-lg">🛒</span>
-        Cart
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex gap-4 items-center">
 
-        {totalQuantity > 0 && (
-          <span className="absolute -top-2 -right-2 bg-yellow-400 text-black rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center text-xs font-bold shadow">
-            {totalQuantity}
-          </span>
-        )}
-      </Link>
-      {/* Auth Button */}
+            <Link
+              to="/"
+              className="px-4 py-2 rounded-xl text-white bg-white/10 hover:bg-white/20 transition"
+            >
+              Home
+            </Link>
+
+            <Link
+              to="/cart"
+              className="relative px-4 py-2 rounded-xl text-white flex items-center gap-2 bg-gradient-to-r from-pink-500/80 to-red-500/80 hover:scale-105"
+            >
+              🛒 Cart
+              {totalQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 bg-yellow-400 text-black rounded-full px-1 text-xs">
+                  {totalQuantity}
+                </span>
+              )}
+            </Link>
+
+            <button
+              onClick={() => setShowAuth(true)}
+              className="px-4 py-2 rounded-xl text-white bg-blue-500 hover:bg-blue-600"
+            >
+              Sign In / Register
+            </button>
+          </nav>
+
+          {/* Mobile Menu Button */}
           <button
-            
-            className="px-4 py-2 rounded-xl text-white font-medium bg-blue-500/80 hover:bg-blue-600 transition-all duration-300 hover:scale-105"
+            className="md:hidden text-white text-2xl"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            Sign In / Register
+            ☰
           </button>
-    </nav>
-  </div>
+        </div>
 
+        {/* Mobile Menu */}
+        {isOpen && (
+          <div className="md:hidden px-4 pb-4 flex flex-col gap-3">
 
-</header>
-  )
+            <Link
+              to="/"
+              onClick={() => setIsOpen(false)}
+              className="text-white bg-white/10 p-2 rounded-lg"
+            >
+              Home
+            </Link>
+
+            <Link
+              to="/cart"
+              onClick={() => setIsOpen(false)}
+              className="text-white bg-pink-500/80 p-2 rounded-lg flex justify-between"
+            >
+              Cart
+              {totalQuantity > 0 && (
+                <span className="bg-yellow-400 text-black px-2 rounded-full text-xs">
+                  {totalQuantity}
+                </span>
+              )}
+            </Link>
+
+            <button
+              onClick={() => {
+                setShowAuth(true);
+                setIsOpen(false);
+              }}
+              className="text-white bg-blue-500 p-2 rounded-lg"
+            >
+              Sign In / Register
+            </button>
+          </div>
+        )}
+      </header>
+
+      {/* 🔥 Auth Modal */}
+      {showAuth && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="relative">
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowAuth(false)}
+              className="absolute -top-3 -right-3 bg-white rounded-full px-2 shadow"
+            >
+              ✕
+            </button>
+
+            <AuthForm />
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
-
- 
