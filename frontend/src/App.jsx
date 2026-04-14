@@ -1,12 +1,15 @@
 import React, { Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+
 // Lazy loaded components for performance optimization
 const Home = React.lazy(() => import('./pages/Home'))
 const ProductDetail = React.lazy(() => import('./pages/ProductDetail'))
 const Cart = React.lazy(() => import('./pages/Cart'))
 const Checkout = React.lazy(() => import('./pages/Checkout'))
 const NotFound = React.lazy(() => import('./pages/NotFound'))
+// const AuthForm = React.lazy(()=> ('./components/AuthForm'))
+
 
 // Loading component
 function Loading(){
@@ -79,6 +82,13 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
+  // {
+  //   path: '/auth', 
+  //   element:(
+  //   <Suspense fallback={<Loading />}>
+  //       <AuthForm />
+  //     </Suspense>),
+  // },
 ])
 
 function App() {

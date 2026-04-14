@@ -2,10 +2,13 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectTotalQuantity } from '../store/cartSlice'
+import AuthForm from './AuthForm.jsx';
+import { useState } from 'react';
 
 
  export default function Header (){
   const totalQuantity = useSelector(selectTotalQuantity)
+  
 
   return (
     <header className="bg-gray-600/30 backdrop-blur-xl shadow-lg border-b border-white/20 sticky top-0 z-50">
@@ -43,8 +46,17 @@ import { selectTotalQuantity } from '../store/cartSlice'
           </span>
         )}
       </Link>
+      {/* Auth Button */}
+          <button
+            
+            className="px-4 py-2 rounded-xl text-white font-medium bg-blue-500/80 hover:bg-blue-600 transition-all duration-300 hover:scale-105"
+          >
+            Sign In / Register
+          </button>
     </nav>
   </div>
+
+
 </header>
   )
 }
