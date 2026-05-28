@@ -9,9 +9,13 @@ function ProductList(){
   const searchTerm = useSelector(selectSearchTerm)
 
   // Filter products based on search term
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = products.filter((product) => {
+    const term = searchTerm.toLowerCase()
+    return (
+      product.title?.toLowerCase().includes(term) ||
+      product.category?.toLowerCase().includes(term)
+    )
+  })
 
   // Loading state
   if (loading) {

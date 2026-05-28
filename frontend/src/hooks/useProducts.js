@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
+import api from '../config/api.js'
+import { mapProducts } from '../utils/mapProduct.js'
 
-
-function useProducts(){
+function useProducts() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -12,17 +13,20 @@ function useProducts(){
         setLoading(true)
         setError(null)
 
-        const response = await fetch('https://localhost:3000/api/products')
+        const { data } = await api.get('/products')
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to fetch products')
         }
 
-        const data = await response.json()
-        setProducts(data.products || [])
+        setProducts(mapProducts(data.data))
       } catch (err) {
         console.error('Error fetching products:', err)
-        setError(err.message || 'Failed to fetch products')
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            'Failed to fetch products'
+        )
       } finally {
         setLoading(false)
       }

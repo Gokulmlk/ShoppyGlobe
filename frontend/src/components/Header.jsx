@@ -1,30 +1,53 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectTotalQuantity } from "../store/cartSlice";
-import AuthForm from "./AuthForm.jsx";
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectTotalQuantity, loadCart } from '../store/cartSlice'
+import { getStoredUser, clearAuthSession, AUTH_CHANGE_EVENT } from '../config/api.js'
+import AuthForm from './AuthForm.jsx'
 
 export default function Header() {
-  const totalQuantity = useSelector(selectTotalQuantity);
+  const dispatch = useDispatch()
+  const totalQuantity = useSelector(selectTotalQuantity)
 
-  const [isOpen, setIsOpen] = useState(false); // mobile menu
-  const [showAuth, setShowAuth] = useState(false); // auth modal
+  const [isOpen, setIsOpen] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
+  const [user, setUser] = useState(() => getStoredUser())
+
+  useEffect(() => {
+    if (user) {
+      dispatch(loadCart())
+    }
+  }, [user, dispatch])
+
+  useEffect(() => {
+    const syncUser = () => setUser(getStoredUser())
+    window.addEventListener(AUTH_CHANGE_EVENT, syncUser)
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, syncUser)
+  }, [])
+
+  const handleAuthSuccess = (loggedInUser) => {
+    setUser(loggedInUser)
+    setShowAuth(false)
+    dispatch(loadCart())
+  }
+
+  const handleLogout = () => {
+    clearAuthSession()
+    setUser(null)
+    window.location.reload()
+  }
 
   return (
     <>
       <header className="bg-gray-600/30 backdrop-blur-xl shadow-lg border-b border-white/20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-
-          {/* Logo */}
           <Link to="/" className="no-underline">
-            <h1 className="text-2xl font-extrabold bg-black bg-clip-text text-transparent tracking-wide">
+            <h1 className="text-2xl font-extrabold text-white tracking-wide">
               🛒 ShoppyGlobe
             </h1>
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex gap-4 items-center">
-
             <Link
               to="/"
               className="px-4 py-2 rounded-xl text-white bg-white/10 hover:bg-white/20 transition"
@@ -44,15 +67,26 @@ export default function Header() {
               )}
             </Link>
 
-            <button
-              onClick={() => setShowAuth(true)}
-              className="px-4 py-2 rounded-xl text-white bg-blue-500 hover:bg-blue-600"
-            >
-              Sign In / Register
-            </button>
+            {user ? (
+              <>
+                <span className="text-white text-sm">Hi, {user.name}</span>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 rounded-xl text-white bg-red-500 hover:bg-red-600"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setShowAuth(true)}
+                className="px-4 py-2 rounded-xl text-white bg-blue-500 hover:bg-blue-600"
+              >
+                Sign In / Register
+              </button>
+            )}
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden text-white text-2xl"
             onClick={() => setIsOpen(!isOpen)}
@@ -61,10 +95,8 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden px-4 pb-4 flex flex-col gap-3">
-
             <Link
               to="/"
               onClick={() => setIsOpen(false)}
@@ -86,25 +118,37 @@ export default function Header() {
               )}
             </Link>
 
-            <button
-              onClick={() => {
-                setShowAuth(true);
-                setIsOpen(false);
-              }}
-              className="text-white bg-blue-500 p-2 rounded-lg"
-            >
-              Sign In / Register
-            </button>
+            {user ? (
+              <>
+                <span className="text-white text-sm p-2">Hi, {user.name}</span>
+                <button
+                  onClick={() => {
+                    handleLogout()
+                    setIsOpen(false)
+                  }}
+                  className="text-white bg-red-500 p-2 rounded-lg"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setShowAuth(true)
+                  setIsOpen(false)
+                }}
+                className="text-white bg-blue-500 p-2 rounded-lg"
+              >
+                Sign In / Register
+              </button>
+            )}
           </div>
         )}
       </header>
 
-      {/*Auth Modal */}
       {showAuth && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="relative">
-
-            {/* Close Button */}
             <button
               onClick={() => setShowAuth(false)}
               className="absolute -top-3 -right-3 bg-white rounded-full px-2 shadow"
@@ -112,10 +156,10 @@ export default function Header() {
               ✕
             </button>
 
-            <AuthForm />
+            <AuthForm onSuccess={handleAuthSuccess} />
           </div>
         </div>
       )}
     </>
-  );
+  )
 }

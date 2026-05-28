@@ -1,56 +1,71 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react'
+import api, { setAuthSession } from '../config/api.js'
 
-const AuthCard = () => {
-  const [isLogin, setIsLogin] = useState(true);
+function AuthForm({
+  onSuccess,
+  title,
+  subtitle,
+  defaultMode = 'login',
+}) {
+  const [isLogin, setIsLogin] = useState(defaultMode === 'login')
+  const [submitting, setSubmitting] = useState(false)
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+    name: '',
+    email: '',
+    password: '',
+  })
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
   const toggleMode = () => {
-    setIsLogin(!isLogin);
-  };
+    setIsLogin(!isLogin)
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    setSubmitting(true)
 
     try {
-      const url = isLogin
-        ? "http://localhost:5000/api/auth/login"
-        : "http://localhost:5000/api/auth/register";
-
+      const endpoint = isLogin ? '/auth/login' : '/auth/register'
       const payload = isLogin
         ? { email: formData.email, password: formData.password }
-        : formData;
+        : formData
 
-      const res = await axios.post(url, payload);
+      const { data } = await api.post(endpoint, payload)
 
-      // Save token
-      localStorage.setItem("token", res.data.token);
+      if (!data.success) {
+        throw new Error(data.message || 'Request failed')
+      }
 
-      alert(res.data.message || "Success");
+      const { token, _id, name, email } = data.data
+      setAuthSession({
+        token,
+        user: { _id, name, email },
+      })
 
+      onSuccess?.({ _id, name, email })
     } catch (err) {
-      alert(err.response?.data?.message || "Error occurred");
+      alert(err.response?.data?.message || err.message || 'Error occurred')
+    } finally {
+      setSubmitting(false)
     }
-  };
+  }
 
   return (
-    <div className=" flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-[350px]">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          {isLogin ? "Sign In" : "Register"}
+    <div className="flex items-center justify-center">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-2">
+          {title ?? (isLogin ? 'Sign In' : 'Create Account')}
         </h2>
+        {subtitle && (
+          <p className="text-center text-gray-600 text-sm mb-6">{subtitle}</p>
+        )}
+        {!subtitle && <div className="mb-4" />}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           {!isLogin && (
             <input
               type="text"
@@ -77,6 +92,7 @@ const AuthCard = () => {
             type="password"
             name="password"
             placeholder="Password"
+            minLength={6}
             className="w-full p-2 border rounded-lg"
             value={formData.password}
             onChange={handleChange}
@@ -85,24 +101,26 @@ const AuthCard = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+            disabled={submitting}
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:opacity-60"
           >
-            {isLogin ? "Login" : "Register"}
+            {submitting ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
 
         <p className="text-center mt-4 text-sm">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          {isLogin ? "Don't have an account?" : 'Already have an account?'}
           <button
+            type="button"
             onClick={toggleMode}
             className="text-blue-500 ml-2 font-semibold"
           >
-            {isLogin ? "Register" : "Login"}
+            {isLogin ? 'Register' : 'Login'}
           </button>
         </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AuthCard;
+export default AuthForm

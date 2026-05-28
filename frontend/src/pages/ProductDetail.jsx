@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { addToCart } from '../store/cartSlice'
+import { addToCartAsync } from '../store/cartSlice'
+import api from '../config/api.js'
+import { mapProduct } from '../utils/mapProduct.js'
 import Header from '../components/Header'
 
-
-function ProductDetail(){
+function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -17,22 +18,26 @@ function ProductDetail(){
   const [addedToCart, setAddedToCart] = useState(false)
 
   useEffect(() => {
-    const fetchProductDetail = async () =>{
+    const fetchProductDetail = async () => {
       try {
         setLoading(true)
         setError(null)
 
-        const response = await fetch(`https://dummyjson.com/products/${id}`)
+        const { data } = await api.get(`/products/${id}`)
 
-        if (!response.ok) {
-          throw new Error(`Product not found (${response.status})`)
+        if (!data.success) {
+          throw new Error(data.message || 'Product not found')
         }
 
-        const data = await response.json()
-        setProduct(data)
+        setProduct(mapProduct(data.data))
+        setSelectedImage(0)
       } catch (err) {
         console.error('Error fetching product detail:', err)
-        setError(err.message || 'Failed to fetch product details')
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            'Failed to fetch product details'
+        )
       } finally {
         setLoading(false)
       }
@@ -41,11 +46,15 @@ function ProductDetail(){
     fetchProductDetail()
   }, [id])
 
-  function handleAddToCart () {
-    if (product) {
-      dispatch(addToCart(product))
+  async function handleAddToCart() {
+    if (!product) return
+
+    try {
+      await dispatch(addToCartAsync(product)).unwrap()
       setAddedToCart(true)
       setTimeout(() => setAddedToCart(false), 2000)
+    } catch (err) {
+      alert(typeof err === 'string' ? err : 'Could not add to cart')
     }
   }
 
@@ -66,7 +75,9 @@ function ProductDetail(){
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
-          <h2 className="text-2xl text-red-600 mb-4">❌ {error || 'Product Not Found'}</h2>
+          <h2 className="text-2xl text-red-600 mb-4">
+            ❌ {error || 'Product Not Found'}
+          </h2>
           <button
             onClick={() => navigate('/')}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -90,7 +101,6 @@ function ProductDetail(){
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 bg-white p-6 md:p-8 rounded-2xl shadow-lg">
-          {/* Product Images */}
           <div className="flex flex-col gap-4">
             <div className="w-full h-96 md:h-[500px] bg-gray-100 rounded-xl overflow-hidden">
               <img
@@ -118,7 +128,6 @@ function ProductDetail(){
             )}
           </div>
 
-          {/* Product Info */}
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
@@ -133,7 +142,9 @@ function ProductDetail(){
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-4xl font-bold text-green-600">${product.price}</span>
+              <span className="text-4xl font-bold text-green-600">
+                ${product.price}
+              </span>
               {product.discountPercentage > 0 && (
                 <span className="text-sm text-red-500 bg-red-50 px-3 py-1 rounded-md font-semibold">
                   {product.discountPercentage}% OFF
@@ -141,7 +152,9 @@ function ProductDetail(){
               )}
             </div>
 
-            <p className="text-base text-gray-700 leading-relaxed">{product.description}</p>
+            <p className="text-base text-gray-700 leading-relaxed">
+              {product.description}
+            </p>
 
             <div className="flex flex-col gap-3 p-6 bg-gray-50 rounded-xl">
               <div className="flex gap-2 text-sm text-gray-700">
@@ -179,8 +192,8 @@ function ProductDetail(){
                 addedToCart
                   ? 'bg-green-600 text-white'
                   : product.stock === 0
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
               {addedToCart ? '✓ Added to Cart!' : '🛒 Add to Cart'}
