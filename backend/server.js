@@ -56,7 +56,7 @@ app.get('/', (req, res) => {
 
 app.use(errorHandler); // Error handler middleware
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Start Server
 app.listen(PORT, () => {
